@@ -12,6 +12,7 @@ function originIsAllowed(origin) {
 }
 
 wss.on('request', (request) => {
+  console.log(request.origin);
   if (!originIsAllowed(request.origin)) {
     request.reject();
     return;
