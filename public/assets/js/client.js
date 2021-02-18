@@ -315,7 +315,7 @@ function loginProcess(success) {
       },
       function (error) {
         console.log(error);
-        alert('Error');
+        alert('Errors');
       }
     );
   }
