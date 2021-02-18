@@ -4,7 +4,8 @@ const express = require('express');
 const app = express();
 app.use(express.static('public'));
 const server = http.createServer(app);
-app.get('/test', (req, res) => {
+app.get('/', (req, res) => {
+  console.log('Hello World');
   res.send('Hello World');
 });
 server.listen(3000, () => {
