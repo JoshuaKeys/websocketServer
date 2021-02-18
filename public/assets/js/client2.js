@@ -1,4 +1,4 @@
-var connection = new WebSocket('ws://localhost:3000', 'echo-protocol');
+var connection = new WebSocket('wss://joshua-dev.life', 'echo-protocol');
 let stream;
 let userName;
 var url_string = window.location.href;
