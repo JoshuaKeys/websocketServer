@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "startServer": "nodemon index.js",
     "startProd": "pm2 start index.js --name websocket-server",
+    "reloadProd": "pm2 reload websocket-server",
+    "restartProd": "pm2 restart websocket-server",
     "stopProd": "pm2 stop websocket-server"
   },
   "keywords": [
