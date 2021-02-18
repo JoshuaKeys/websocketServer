@@ -243,7 +243,7 @@ function loginProcess(success) {
           ],
         };
 
-        myConn = new webkitRTCPeerConnection(configuration, {
+        myConn = new RTCPeerConnection(configuration, {
           optional: [
             {
               RtpDataChannels: true,
@@ -315,7 +315,6 @@ function loginProcess(success) {
       })
       .catch(function (error) {
         console.log(error);
-        alert('Error', JSON.stringify(error));
       });
   }
 }
