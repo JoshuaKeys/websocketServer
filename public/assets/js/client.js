@@ -225,6 +225,7 @@ function loginProcess(success) {
   if (success === false) {
     alert('Try a different username');
   } else {
+    alert('Connected');
     navigator.getUserMedia(
       {
         video: true,
