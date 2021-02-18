@@ -315,7 +315,7 @@ function loginProcess(success) {
       })
       .catch(function (error) {
         console.log(error);
-        alert('Error', error);
+        alert('Error', JSON.stringify(error));
       });
   }
 }
