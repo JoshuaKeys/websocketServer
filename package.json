@@ -1,0 +1,20 @@
+{
+  "name": "webrtc",
+  "version": "1.0.0",
+  "description": "First webrtc app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "startServer": "nodemon index.js"
+  },
+  "keywords": [
+    "webrtc"
+  ],
+  "author": "Km Habib",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "websocket": "^1.0.33",
+    "wscat": "^4.0.1"
+  }
+}
