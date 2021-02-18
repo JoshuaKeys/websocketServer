@@ -4,6 +4,7 @@ const handleWsMsg = require('./lib/helpers/handleWsMsg');
 var wss = new webSocketServ({
   httpServer,
 });
+const sendToOtherUser = require('./lib/helpers/sendToOtherUser');
 
 var users = {};
 var otherUser;
@@ -12,7 +13,6 @@ function originIsAllowed(origin) {
 }
 
 wss.on('request', (request) => {
-  console.log(request.origin);
   if (!originIsAllowed(request.origin)) {
     request.reject();
     return;
@@ -23,7 +23,6 @@ wss.on('request', (request) => {
     var data;
     try {
       data = JSON.parse(message.utf8Data);
-      console.log(data);
     } catch (e) {
       console.log('Invalid JSON');
       data = {};

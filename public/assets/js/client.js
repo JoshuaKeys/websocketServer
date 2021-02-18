@@ -1,5 +1,5 @@
 var connection = new WebSocket('wss://joshua-dev.life', 'echo-protocol');
-
+console.log(SIPml);
 connection.onopen = function () {
   console.log('Connected to the server');
 };
