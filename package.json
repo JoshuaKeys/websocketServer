@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "startServer": "nodemon index.js"
+    "startServer": "nodemon index.js",
+    "startProd": "pm2 start index.js --name websocket-server",
+    "stopProd": "pm2 stop websocket-server"
   },
   "keywords": [
     "webrtc"
@@ -14,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "pm2": "^4.5.4",
     "websocket": "^1.0.33",
     "wscat": "^4.0.1"
   }
