@@ -225,12 +225,12 @@ function loginProcess(success) {
   if (success === false) {
     alert('Try a different username');
   } else {
-    navigator.mediaDevices
-      .getUserMedia({
+    navigator.getUserMedia(
+      {
         video: true,
         audio: true,
-      })
-      .then(function (myStream) {
+      },
+      function (myStream) {
         stream = myStream;
         local_video.srcObject = stream;
         local_video.muted = true;
@@ -243,7 +243,7 @@ function loginProcess(success) {
           ],
         };
 
-        myConn = new RTCPeerConnection(configuration, {
+        myConn = new webkitRTCPeerConnection(configuration, {
           optional: [
             {
               RtpDataChannels: true,
@@ -312,10 +312,12 @@ function loginProcess(success) {
             });
           }
         };
-      })
-      .catch(function (error) {
+      },
+      function (error) {
         console.log(error);
-      });
+        alert(error);
+      }
+    );
   }
 }
 
