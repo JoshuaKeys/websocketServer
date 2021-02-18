@@ -225,12 +225,12 @@ function loginProcess(success) {
   if (success === false) {
     alert('Try a different username');
   } else {
-    navigator.getUserMedia(
-      {
+    navigator.mediaDevices
+      .getUserMedia({
         video: true,
         audio: true,
-      },
-      function (myStream) {
+      })
+      .then(function (myStream) {
         stream = myStream;
         local_video.srcObject = stream;
         local_video.muted = true;
@@ -312,12 +312,11 @@ function loginProcess(success) {
             });
           }
         };
-      },
-      function (error) {
+      })
+      .catch(function (error) {
         console.log(error);
         alert('Error');
-      }
-    );
+      });
   }
 }
 
