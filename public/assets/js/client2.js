@@ -9,6 +9,10 @@ let remoteVideo = document.querySelector('#remote-video');
 var call_button = document.querySelector('#call-btn');
 var usernameInput = document.querySelector('#username-input');
 var callStatus = document.querySelector('.call-hang-status');
+let dataChannel;
+let msgInput = document.querySelector('#msg-input');
+let msgSendBtn = document.querySelector('#msg-sent-btn');
+let msgChatArea = document.querySelector('.chat-area');
 
 var myConn;
 let connected_user;
@@ -51,20 +55,7 @@ call_button.addEventListener('click', () => {
   if (!userToCall.length) {
     return;
   }
-  myConn
-    .createOffer()
-    .then((sessionDescription) => {
-      myConn.setLocalDescription(sessionDescription);
-      send({
-        type: 'offer',
-        offer: sessionDescription,
-        name: userToCall,
-      });
-    })
-    .catch((err) => {
-      alert('Offer has not being created', err);
-      console.error('offer has not being created', err);
-    });
+  createOffer(userToCall);
 });
 
 // functions
@@ -100,7 +91,14 @@ function handleClientMsg(msg) {
           });
       }
       break;
-
+    case 'leave':
+      remoteVideo.src = null;
+      callStatus.innerHTML = '';
+      myConn.close();
+      myConn.onicecandidate = null;
+      myConn.ontrack = null;
+      connectedUser = null;
+      break;
     case 'offer':
       connected_user = data.name;
       callStatus.innerHTML =
@@ -110,6 +108,9 @@ function handleClientMsg(msg) {
       const callReceive = document.querySelector('.call-accept');
       const callReject = document.querySelector('.call-reject');
       callReceive.addEventListener('click', (evt) => {
+        if (myConn.connectionState === 'closed') {
+          createConnection();
+        }
         myConn.setRemoteDescription(new RTCSessionDescription(data.offer));
         myConn.createAnswer().then((answer) => {
           myConn.setLocalDescription(answer);
@@ -137,6 +138,8 @@ function handleClientMsg(msg) {
       console.log('got candidateeeeee');
       myConn.addIceCandidate(new RTCIceCandidate(data.candidate));
       break;
+    default:
+      break;
   }
 }
 
@@ -148,6 +151,23 @@ function createConnection() {
     ],
   };
   myConn = new RTCPeerConnection(iceServers);
+  dataChannel = myConn.createDataChannel('channel1', {
+    reliable: true,
+  });
+  dataChannel.onerror = (error) => {
+    console.log('Error: ', error);
+  };
+  dataChannel.onmessage = function (event) {
+    chatArea.innerHTML += `<div class="left-align"> 
+      <img src="assets/images/other.jpg" class="caller-image circle">
+      ${connectedUser}: ${event.data}
+      </div><br>
+      `;
+  };
+  dataChannel.onclose = function (event) {
+    console.log('data channel is closed');
+  };
+  console.log(dataChannel);
   myConn.addTrack(stream.getTracks()[0], stream);
   myConn.addTrack(stream.getTracks()[1], stream);
   myConn.onicecandidate = function (event) {
@@ -162,8 +182,39 @@ function createConnection() {
   myConn.ontrack = function (e) {
     console.log(e.streams);
     remoteVideo.srcObject = e.streams[0];
+    // remoteVideo.muted = true;
+    callStatus.innerHTML =
+      ' <div class="call-status-wrap white-text"> <div class="calling-wrap"> <div class="calling-action"> <div class="videocam-on"> <i class="material-icons teal darken-2 white-text video-toggle">videocam</i> </div> <div class="audio-on"> <i class="material-icons teal darken-2 white-text audio-toggle">mic</i> </div> <div class="call-cancel"> <i class="material-icons red darken-3 white-text call-icon">call</i> </div> </div> </div> </div>';
+    var videoToggle = document.querySelector('.videocam-on');
+    var audioToggle = document.querySelector('.audio-on');
+    var videoToggleClass = document.querySelector('.video-toggle');
+    var audioToggleClass = document.querySelector('.audio-toggle');
+    var closeCall = document.querySelector('.call-icon');
+    closeCall.addEventListener('click', () => {
+      console.log(connected_user);
+      hangUp(connected_user);
+    });
+    videoToggle.onclick = () => {
+      console.log(stream.getVideoTracks()[0]);
+      stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
+      if (videoToggleClass.innerText === 'videocam') {
+        videoToggleClass.innerText = 'videocam_off';
+      } else {
+        videoToggleClass.innerText = 'videocam';
+      }
+    };
+
+    audioToggle.onclick = () => {
+      console.log(stream.getAudioTracks()[0]);
+      stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
+      if (audioToggleClass.innerText === 'mic') {
+        audioToggleClass.innerText = 'mic_off';
+      } else {
+        audioToggleClass.innerText = 'mic';
+      }
+    };
   };
-  console.log(stream.getTracks());
+  return myConn;
 }
 function rejectedCall(rejectedUser) {
   send({
@@ -171,3 +222,49 @@ function rejectedCall(rejectedUser) {
     name: rejectedUser,
   });
 }
+function hangUp(name) {
+  var callCancel = document.querySelector('.call-cancel');
+  remoteVideo.src = null;
+  callStatus.innerHTML = '';
+  myConn.close();
+  myConn.onicecandidate = null;
+  myConn.ontrack = null;
+  connectedUser = null;
+  callCancel.addEventListener('click', () => {
+    callStatus.innerHTML = '';
+    send({
+      type: 'leave',
+      name,
+    });
+  });
+}
+
+function createOffer(userToCall) {
+  if (myConn.connectionState == 'closed') {
+    createConnection();
+  }
+  myConn
+    .createOffer()
+    .then((sessionDescription) => {
+      myConn.setLocalDescription(sessionDescription);
+      send({
+        type: 'offer',
+        offer: sessionDescription,
+        name: userToCall,
+      });
+    })
+    .catch((err) => {
+      alert('Offer has not being created', err);
+      console.error('offer has not being created', err);
+    });
+}
+
+// Message sending
+msgSendBtn.addEventListener('click', () => {
+  const val = msgInput.value;
+  chatArea.innerHTML += `<div class='right-align'>${val}: ${userName} 
+  <img src="assets/images/me.jpg" class="caller-image circle">
+  </div><br>`;
+  dataChannel.send(val);
+  msgInput.value = '';
+});
