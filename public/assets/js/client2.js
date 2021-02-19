@@ -12,7 +12,7 @@ var callStatus = document.querySelector('.call-hang-status');
 let dataChannel;
 let msgInput = document.querySelector('#msg-input');
 let msgSendBtn = document.querySelector('#msg-sent-btn');
-let msgChatArea = document.querySelector('.chat-area');
+let msgChatArea = document.querySelector('#chat-area');
 
 var myConn;
 let connected_user;
@@ -66,7 +66,7 @@ function send(message) {
 
 function handleClientMsg(msg) {
   const data = JSON.parse(msg.data);
-  console.log('received', data.type);
+  console.log('received', data);
   switch (data.type) {
     case 'reject':
       callStatus.innerHTML = '';
@@ -90,6 +90,13 @@ function handleClientMsg(msg) {
             console.error(err);
           });
       }
+      break;
+    case 'msg-received':
+      msgChatArea.innerHTML += `<div class="left-align" style="display: flex; align-items: center"> 
+      <img style="height: 40px; width: 40px;" src="assets/images/other.jpg" class="caller-image circle">
+      <div style="font-weight: 600; margin: 0 5px;">${connected_user}</div>: <div style="display: flex; align-item: center;">${data.message}</div>
+      </div><br>
+      `;
       break;
     case 'leave':
       remoteVideo.src = null;
@@ -158,16 +165,11 @@ function createConnection() {
     console.log('Error: ', error);
   };
   dataChannel.onmessage = function (event) {
-    chatArea.innerHTML += `<div class="left-align"> 
-      <img src="assets/images/other.jpg" class="caller-image circle">
-      ${connectedUser}: ${event.data}
-      </div><br>
-      `;
+    console.log('message received');
   };
   dataChannel.onclose = function (event) {
     console.log('data channel is closed');
   };
-  console.log(dataChannel);
   myConn.addTrack(stream.getTracks()[0], stream);
   myConn.addTrack(stream.getTracks()[1], stream);
   myConn.onicecandidate = function (event) {
@@ -262,9 +264,14 @@ function createOffer(userToCall) {
 // Message sending
 msgSendBtn.addEventListener('click', () => {
   const val = msgInput.value;
-  chatArea.innerHTML += `<div class='right-align'>${val}: ${userName} 
-  <img src="assets/images/me.jpg" class="caller-image circle">
+  msgChatArea.innerHTML += `<div class='right-align'><div style="display: flex; align-item: center;">${val}</div>: <div style="font-weight: 600; margin 0 5px">${userName}</div>
+  <img src="assets/images/me.jpg" style="height: 40px; width: 40px" class="caller-image circle">
   </div><br>`;
-  dataChannel.send(val);
+  console.log(connected_user);
+  send({
+    type: 'direct-message',
+    message: val,
+    name: connected_user,
+  });
   msgInput.value = '';
 });
