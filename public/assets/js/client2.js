@@ -93,8 +93,8 @@ function handleClientMsg(msg) {
       break;
     case 'msg-received':
       msgChatArea.innerHTML += `<div class="left-align" style="display: flex; align-items: center"> 
-      <img style="height: 40px; width: 40px;" src="assets/images/other.jpg" class="caller-image circle">
-      <div style="font-weight: 600; margin: 0 5px;">${connected_user}</div>: <div style="display: flex; align-item: center;">${data.message}</div>
+      <img title="${connected_user}" style="height: 40px; width: 40px; padding-right: 5px" src="assets/images/other.jpg" class="caller-image circle">
+      <div style="display: flex; align-item: center;">${data.message}</div>
       </div><br>
       `;
       break;
@@ -264,8 +264,8 @@ function createOffer(userToCall) {
 // Message sending
 msgSendBtn.addEventListener('click', () => {
   const val = msgInput.value;
-  msgChatArea.innerHTML += `<div class='right-align'><div style="display: flex; align-item: center;">${val}</div>: <div style="font-weight: 600; margin 0 5px">${userName}</div>
-  <img src="assets/images/me.jpg" style="height: 40px; width: 40px" class="caller-image circle">
+  msgChatArea.innerHTML += `<div class='right-align' style="display: flex; align-self: flex-end; align-items: center;"><div style="display: flex; align-item: center;">${val}</div>
+  <img title="${userName}" src="assets/images/me.jpg" style="height: 40px; padding-left: 5px; width: 40px" class="caller-image circle">
   </div><br>`;
   console.log(connected_user);
   send({
